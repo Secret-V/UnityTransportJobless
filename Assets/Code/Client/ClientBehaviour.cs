@@ -3,11 +3,14 @@ using System.Collections;
 using Unity.Networking.Transport;
 using System.IO;
 using Assets.Code;
+using Unity.Jobs;
 
 public class ClientBehaviour : MonoBehaviour
 {
     private NetworkDriver networkDriver;
     private NetworkConnection connection;
+
+    private JobHandle networkJobHandle;
 
     // Use this for initialization
     void Start()
@@ -23,7 +26,7 @@ public class ClientBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        networkDriver.ScheduleUpdate().Complete();
+        networkJobHandle.Complete();
 
         if(!connection.IsCreated)
         {
@@ -81,6 +84,8 @@ public class ClientBehaviour : MonoBehaviour
                 connection = default;
             }
         }
+
+        networkJobHandle = networkDriver.ScheduleUpdate();
     }
 
     private void OnDestroy()
